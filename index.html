@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="color-scheme" content="dark light">
+  <title>WGWM – Calculadora de series de aproximación</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏋️</text></svg>">
+</head>
+<body>
+
+<div id="app">
+  <!-- Vista Calculadora -->
+  <main id="view-calc" class="view">
+    <header class="calc-header">
+      <h1>WGWM</h1>
+      <a href="#/opciones" class="btn-icon" aria-label="Opciones" id="btn-options">⚙</a>
+    </header>
+
+    <div class="calc-controls">
+      <label class="field" for="exercise-select">
+        <span class="field-label">Ejercicio</span>
+        <select id="exercise-select" class="field-input"></select>
+      </label>
+
+      <label class="field" for="weight-input">
+        <span class="field-label">Peso de trabajo (lb)</span>
+        <input type="number" id="weight-input" class="field-input" inputmode="decimal" step="0.5" min="0" placeholder="225" autofocus>
+      </label>
+
+      <div class="program-chip">
+        Programa: <strong id="current-program-name"></strong>
+        <a href="#/opciones" class="chip-link">cambiar</a>
+      </div>
+    </div>
+
+    <section id="results" class="results" hidden>
+      <h2>Series</h2>
+      <div class="table-scroll">
+        <table class="sets-table">
+          <thead>
+            <tr>
+              <th>Series</th>
+              <th>Peso</th>
+              <th>Discos por lado</th>
+            </tr>
+          </thead>
+          <tbody id="sets-tbody"></tbody>
+        </table>
+      </div>
+
+      <h2>Discos a juntar</h2>
+      <div id="plates-summary" class="plates-summary"></div>
+    </section>
+
+    <div id="empty-state" class="empty-state">
+      <p>Elige un ejercicio e ingresa tu peso de trabajo para ver las series de aproximación.</p>
+    </div>
+  </main>
+
+  <!-- Vista Opciones -->
+  <main id="view-options" class="view" hidden>
+    <header class="calc-header">
+      <h1>Opciones</h1>
+      <a href="#/" class="btn-icon" aria-label="Volver">✕</a>
+    </header>
+
+    <div class="options-scroll">
+      <fieldset class="opt-group">
+        <legend>Programa</legend>
+        <select id="program-select" class="field-input"></select>
+        <p class="opt-help">Define las series y porcentajes de cada ejercicio.</p>
+      </fieldset>
+
+      <fieldset class="opt-group">
+        <legend>Peso de la barra</legend>
+        <label class="field field-row">
+          <input type="number" id="bar-input" class="field-input" inputmode="decimal" step="0.5" min="5">
+          <span class="field-suffix">lb</span>
+        </label>
+      </fieldset>
+
+      <fieldset class="opt-group">
+        <legend>Discos disponibles</legend>
+        <div id="plates-chips" class="plates-chips"></div>
+        <label class="field field-row">
+          <input type="number" id="new-plate-input" class="field-input" inputmode="decimal" step="0.25" min="0.25" placeholder="ej. 1.25">
+          <button type="button" id="add-plate-btn" class="btn btn-sm">Agregar disco</button>
+        </label>
+        <p class="opt-help">Activa o desactiva discos. También puedes agregar pesos personalizados (ej. 1.25, 55, 100).</p>
+      </fieldset>
+
+      <fieldset class="opt-group">
+        <legend>Peso mínimo de redondeo por ejercicio</legend>
+        <div id="exercise-mins"></div>
+        <p class="opt-help">El peso calculado se redondea hacia abajo al múltiplo de este valor.</p>
+      </fieldset>
+
+      <div class="opt-actions">
+        <button type="button" id="reset-btn" class="btn btn-danger">Restablecer valores por defecto</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
