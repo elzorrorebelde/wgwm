@@ -287,6 +287,17 @@ select.field-input {
   color: var(--text-muted);
 }
 
+.per-side-cell {
+  white-space: normal;
+  min-width: 9rem;
+}
+
+.per-side-sum {
+  margin-top: 0.2rem;
+  font-family: var(--font);
+  font-size: 0.75rem;
+}
+
 .per-side-cell span {
   background: var(--bg);
   padding: 0.1rem 0.35rem;
@@ -454,4 +465,9 @@ select.field-input {
   .exercise-min-row {
     gap: 1rem;
   }
+}
+.h2-note {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-muted);
 }

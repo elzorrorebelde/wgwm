@@ -52,39 +52,52 @@ export function loadableFloor(totalWeight, barWeight, plates) {
 
   const perSideTarget = (totalWeight - barWeight) / 2;
   const targetUnits = u(perSideTarget);
-  const plateUnits = plates.map((p) => u(p));
 
-  // DP: dp[w] = mínimo número de discos para w unidades por lado;
-  // via[w] = disco (en unidades) usado en el último paso, para reconstruir.
-  const dp = new Array(targetUnits + 1).fill(Infinity);
-  const via = new Array(targetUnits + 1).fill(0);
-  dp[0] = 0;
+  // Discos únicos y válidos, del más pesado al más ligero (en unidades).
+  const unitToPlate = new Map();
+  for (const p of plates) {
+    const pu = u(p);
+    if (pu > 0 && !unitToPlate.has(pu)) unitToPlate.set(pu, p);
+  }
+  const plateUnits = [...unitToPlate.keys()].sort((a, b) => b - a);
 
-  for (const pu of plateUnits) {
-    if (pu <= 0) continue;
+  // reach[i][w] = ¿se puede formar w unidades por lado usando solo los discos
+  // plateUnits[i..]? (i = n → solo w = 0). Permite reconstruir "más pesado
+  // primero" sin quedar atrapado en un callejón sin salida.
+  const n = plateUnits.length;
+  const reach = new Array(n + 1);
+  reach[n] = new Array(targetUnits + 1).fill(false);
+  reach[n][0] = true;
+  for (let i = n - 1; i >= 0; i--) {
+    const pu = plateUnits[i];
+    const row = reach[i + 1].slice();
     for (let w = pu; w <= targetUnits; w++) {
-      if (dp[w - pu] + 1 < dp[w]) {
-        dp[w] = dp[w - pu] + 1;
-        via[w] = pu;
-      }
+      if (row[w - pu]) row[w] = true;
     }
+    reach[i] = row;
   }
 
-  // Buscar el mayor peso alcanzable ≤ target
+  // Mayor peso por lado alcanzable ≤ objetivo
   let bestUnits = 0;
   for (let w = targetUnits; w >= 0; w--) {
-    if (dp[w] !== Infinity) {
+    if (reach[0][w]) {
       bestUnits = w;
       break;
     }
   }
 
-  // Reconstruir siguiendo los punteros del DP (siempre suma bestUnits)
-  const unitToPlate = new Map(plates.map((p) => [u(p), p]));
+  // Reconstrucción: disco más pesado primero (los discos no están calibrados,
+  // así que se evita acumular muchos del mismo tipo), siempre que lo que
+  // quede siga siendo alcanzable con los discos restantes.
   const perSide = {};
-  for (let w = bestUnits; w > 0; w -= via[w]) {
-    const p = unitToPlate.get(via[w]);
-    perSide[p] = (perSide[p] || 0) + 1;
+  let rem = bestUnits;
+  for (let i = 0; i < n; i++) {
+    const pu = plateUnits[i];
+    while (rem >= pu && reach[i][rem - pu]) {
+      const p = unitToPlate.get(pu);
+      perSide[p] = (perSide[p] || 0) + 1;
+      rem -= pu;
+    }
   }
 
   const total = barWeight + 2 * lb(bestUnits);

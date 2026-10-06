@@ -115,6 +115,32 @@ describe("loadableFloor", () => {
     }
   });
 
+  it("200 lb → 45 + 25 + 5 + 2.5 por lado (más pesado primero)", () => {
+    const r = loadableFloor(200, bar, std);
+    assert.strictEqual(r.total, 200);
+    assert.deepStrictEqual(r.perSide, { 45: 1, 25: 1, 5: 1, 2.5: 1 });
+  });
+
+  it("165 lb → 45 + 10 + 5 (no 35 + 25: los discos no están calibrados)", () => {
+    const r = loadableFloor(165, bar, std);
+    assert.deepStrictEqual(r.perSide, { 45: 1, 10: 1, 5: 1 });
+  });
+
+  it("con discos estándar coincide con el voraz puro en todo el rango", () => {
+    const greedy = (side) => {
+      const o = {};
+      for (const p of std) {
+        const c = Math.floor(side / p);
+        if (c) { o[p] = c; side -= c * p; }
+      }
+      return o;
+    };
+    for (let t = 45; t <= 600; t += 2.5) {
+      const r = loadableFloor(t, bar, std);
+      assert.deepStrictEqual(r.perSide, greedy((r.total - bar) / 2), `t=${t}`);
+    }
+  });
+
   it("devuelve la barra si ningún disco entra", () => {
     const r = loadableFloor(46, bar, [45, 35]);
     assert.strictEqual(r.total, 45);

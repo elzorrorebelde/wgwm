@@ -43,10 +43,17 @@ function esc(str) {
 
 function renderPerSide(perSide) {
   const entries = Object.entries(perSide).sort(([a], [b]) => Number(b) - Number(a));
-  if (entries.length === 0) return '<span class="per-side-empty">—</span>';
+  if (entries.length === 0) return '<span class="per-side-empty">solo barra</span>';
+  // Un chip por disco físico (45 · 25 · 5), no "3×25", para evitar ambigüedad.
   return entries
-    .map(([denom, count]) => `<span>${count}×${esc(denom)}</span>`)
+    .flatMap(([denom, count]) => Array.from({ length: count }, () => `<span>${esc(denom)}</span>`))
     .join("");
+}
+
+function renderSideTotal(row, bar) {
+  if (Object.keys(row.perSide).length === 0) return "";
+  const side = (row.weight - bar) / 2;
+  return `<div class="per-side-sum">${esc(side)} lb en cada lado</div>`;
 }
 
 // ── render: calculator ─────────────────────────────────────────────────
@@ -91,7 +98,7 @@ export function renderSets(state, workingWeight) {
       return `<tr>
         <td>${esc(r.sets)}×${esc(r.reps)}</td>
         <td${adjustedClass}>${esc(r.weight)} lb${adjMark}</td>
-        <td class="per-side-cell">${renderPerSide(r.perSide)}</td>
+        <td class="per-side-cell">${renderPerSide(r.perSide)}${renderSideTotal(r, state.barWeight)}</td>
       </tr>`;
     })
     .join("");
